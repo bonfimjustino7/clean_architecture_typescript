@@ -1,0 +1,46 @@
+version: '3'
+
+services:
+  express:
+    build: .
+    volumes:
+      - .:/app
+    depends_on:
+      - db
+    command: yarn express
+    ports:
+      - 5000:5000
+
+  hapi:
+    build: .
+    volumes:
+      - .:/app
+    ports:
+      - 4000:4000
+    depends_on:
+      - db
+
+    command: yarn hapi
+
+  db:
+    image: postgres:9.4
+    restart: always
+    tty: true
+    volumes:
+      - .pgdata:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_PASSWORD=root
+      - POSTGRES_DB=example
+    ports:
+      - '5432:5432'
+
+  pgadmin:
+    image: dpage/pgadmin4
+    tty: true
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=admin@user.com
+      - PGADMIN_DEFAULT_PASSWORD=123456
+    ports:
+      - '9000:80'
+    depends_on:
+      - db
